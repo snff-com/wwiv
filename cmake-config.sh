@@ -17,28 +17,33 @@
 
 declare -r OS=$(uname)
 declare -r HERE=$(dirname $(realpath $0))
-declare -r NINJA=$(which ninja)
+declare -r Ninja=$("Ninja")
+
+declare -r CMAKE_CXX_COMPILER=/usr/bin/g++
+declare -r CMAKE_C_COMPILER=/usr/bin/gcc
+declare -r CMAKE_MAKE_PROGRAM=./Ninja
 
 if ! [ -x "$(command -v cmake)" ]; then
 	echo "** ERROR: Please install cmake"
 	exit 1
 fi
 
-if ! [ -x "$(command -v ninja)" ]; then
+if ! [ -x "$(command -v ./ninja)" ]; then
 	echo "** ERROR: Please install ninja"
 	echo ""
 	echo "   Debian/Ubuntu: apt install ninja-build"
 	echo "   CentOS:        yum install ninja-build"
-	exit 1
+
 fi
 
 if [[ "${OS}" == "SunOS" ]]; then
-    echo "Setting compiler to gcc for SunOS"
-    export CXX=/usr/bin/g++
-    export CC=/usr/bin/gcc
+	echo "Setting compiler to gcc for SunOS"
+	export CMAKE_CXX_COMPILER=/usr/bin/g++
+	export CMAKE_C_COMPILER=/usr/bin/gcc
+	export CMAKE_MAKE_PROGRAM=./Ninja
 fi
 
-echo "Using Ninja Build Tool: ${NINJA}"
+echo "Using Ninja Build Tool: ${Ninja}"
 echo "Using Source Root:      ${HERE}"
 
-cmake -G "Ninja" ${HERE}  -DCMAKE_TOOLCHAIN_FILE=${HERE}/vcpkg/scripts/buildsystems/vcpkg.cmake "${@}"
+cmake -G "Ninja" ${HERE} -DCMAKE_TOOLCHAIN_FILE=${HERE}/vcpkg/scripts/buildsystems/vcpkg.cmake "${@}"	
